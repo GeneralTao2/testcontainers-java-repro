@@ -3,8 +3,13 @@ package org.testcontainers.repro;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+
+import java.nio.file.Paths;
+import java.time.Duration;
 
 public class ReproExampleTest {
 
@@ -21,11 +26,15 @@ public class ReproExampleTest {
     @Test
     public void demonstration() {
         try (
-            // customize the creation of a container as required
-            GenericContainer<?> container = new GenericContainer<>(DockerImageName.parse("redis:6.0.5"))
-                    .withExposedPorts(6379)
+                // customize the creation of a container as required
+                DockerComposeContainer<?> environment = new DockerComposeContainer<>(
+                        Paths.get("docker/docker-compose.yml").toFile())
+                        .withLocalCompose(true)
+                        .withOptions("--compatibility")
+                        .withStartupTimeout(Duration.ofSeconds(1000))
+                        .waitingFor("redis", Wait.forHealthcheck());
         ) {
-            container.start();
+            environment.start();
 
             // ...
         }

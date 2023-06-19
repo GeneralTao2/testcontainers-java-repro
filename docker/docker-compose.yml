@@ -1,0 +1,10 @@
+version: '2.4'
+
+services:
+  redis:
+    image: redis:6.0.5
+    healthcheck:
+      test: exit 1
+      interval: 1000s
+      timeout: 1000s
+      retries: 10
